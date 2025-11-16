@@ -1,4 +1,5 @@
 const oracledb = require('oracledb');
+oracledb.initOracleClient();
 
 oracledb.outFormat = oracledb.OBJECT;
 oracledb.fetchAsString = [oracledb.CLOB];
@@ -40,6 +41,14 @@ module.exports = class ClienteService {
             const clienteCollection = await soda.createCollection(CLIENTES_COLLECTION);
             let clientes = await clienteCollection.find().getDocuments();
             clientes.forEach((element) => {
+                if (Buffer.isBuffer(content)) {
+                  try {
+                    content = JSON.parse(content.toString("utf-8"));
+                  } catch (error) {
+                    console.error("Error parsing document content:", error);
+                    content = {};
+                  }
+                }
                 result.push({
                     id: element.key,
                     createdOn: element.createdOn,
@@ -71,6 +80,14 @@ module.exports = class ClienteService {
             const soda = connection.getSodaDatabase();
             const clientesCollection = await soda.createCollection(CLIENTES_COLLECTION);
             cliente = await clientesCollection.find().key(clienteId).getOne();
+            if (Buffer.isBuffer(content)) {
+              try {
+                    content = JSON.parse(content.toString("utf-8"));
+              } catch (error) {
+                    console.error("Error parsing document content:", error);
+                    content = {};
+              }
+            }
             result = {
                 id: cliente.key,
                 createdOn: cliente.createdOn,

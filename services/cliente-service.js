@@ -41,6 +41,7 @@ module.exports = class ClienteService {
             const clienteCollection = await soda.createCollection(CLIENTES_COLLECTION);
             let clientes = await clienteCollection.find().getDocuments();
             clientes.forEach((element) => {
+                let content = element.getContent();
                 if (Buffer.isBuffer(content)) {
                   try {
                     content = JSON.parse(content.toString("utf-8"));
@@ -53,7 +54,7 @@ module.exports = class ClienteService {
                     id: element.key,
                     createdOn: element.createdOn,
                     lastModified: element.lastModified,
-                    ...element.getContent(),
+                    ...content,
                 });
             });
         } catch (err) {
@@ -80,6 +81,7 @@ module.exports = class ClienteService {
             const soda = connection.getSodaDatabase();
             const clientesCollection = await soda.createCollection(CLIENTES_COLLECTION);
             cliente = await clientesCollection.find().key(clienteId).getOne();
+            let content = element.getContent();
             if (Buffer.isBuffer(content)) {
               try {
                     content = JSON.parse(content.toString("utf-8"));
@@ -92,7 +94,7 @@ module.exports = class ClienteService {
                 id: cliente.key,
                 createdOn: cliente.createdOn,
                 lastModified: cliente.lastModified,
-                ...cliente.getContent(),
+                ...content,
             };
 
         } catch (err) {

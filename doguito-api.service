@@ -5,10 +5,10 @@ After=network.target
 [Service]
 Environment="DB_USER=ADMIN"
 Environment="DB_PASSWORD=Doguito123456"
-Environment="CONNECT_STRING=doguitodb_high"
+Environment="CONNECT_STRING=doguitodb2_high"
 Type=simple
 User=opc
-ExecStart=/usr/bin/node /home/opc/1911-OCI2-doguito-app/bin/www
+ExecStart=/usr/bin/node /home/opc/doguito-app/bin/www
 Restart=on-failure
 
 [Install]

@@ -31,88 +31,89 @@ module.exports = class ClienteService {
     }
 
     async getAll() {
-        let connection;
-        const result = [];
+    let connection;
+    const result = [];
 
-        try {
-            connection = await oracledb.getConnection();
+    try {
+      connection = await oracledb.getConnection();
 
-            const soda = connection.getSodaDatabase();
-            const clienteCollection = await soda.createCollection(CLIENTES_COLLECTION);
-            let clientes = await clienteCollection.find().getDocuments();
-            clientes.forEach((element) => {
-                let content = element.getContent();
-                if (Buffer.isBuffer(content)) {
-                  try {
-                    content = JSON.parse(content.toString("utf-8"));
-                  } catch (error) {
-                    console.error("Error parsing document content:", error);
-                    content = {};
-                  }
-                }
-                result.push({
-                    id: element.key,
-                    createdOn: element.createdOn,
-                    lastModified: element.lastModified,
-                    ...content,
-                });
-            });
-        } catch (err) {
-            console.error(err);
-        } finally {
-            if (connection) {
-                try {
-                    await connection.close();
-                }
-                catch (err) {
-                    console.error(err);
-                }
-            }
+      const soda = connection.getSodaDatabase();
+      const clienteCollection = await soda.createCollection(
+        CLIENTES_COLLECTION
+      );
+      let clientes = await clienteCollection.find().getDocuments();
+      clientes.forEach((element) => {
+        let content = element.getContent();
+        if (Buffer.isBuffer(content)) {
+          try {
+            content = JSON.parse(content.toString("utf-8"));
+          } catch (error) {
+            console.error("Error parsing document content:", error);
+            content = {};
+          }
         }
-        return result;
+        result.push({
+          id: element.key,
+          createdOn: element.createdOn,
+          lastModified: element.lastModified,
+          ...content,
+        });
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (err) {
+          console.error(err);
+        }
+      }
     }
-
+    return result;
+  }
+    
     async getById(clienteId) {
-        let connection, cliente, result;
+    let connection, cliente, result;
 
+    try {
+      connection = await oracledb.getConnection();
+
+      const soda = connection.getSodaDatabase();
+      const clientesCollection = await soda.createCollection(
+        CLIENTES_COLLECTION
+      );
+      cliente = await clientesCollection.find().key(clienteId).getOne();
+      let content = cliente.getContent();
+      if (Buffer.isBuffer(content)) {
         try {
-            connection = await oracledb.getConnection();
-
-            const soda = connection.getSodaDatabase();
-            const clientesCollection = await soda.createCollection(CLIENTES_COLLECTION);
-            cliente = await clientesCollection.find().key(clienteId).getOne();
-            let content = element.getContent();
-            if (Buffer.isBuffer(content)) {
-              try {
-                    content = JSON.parse(content.toString("utf-8"));
-              } catch (error) {
-                    console.error("Error parsing document content:", error);
-                    content = {};
-              }
-            }
-            result = {
-                id: cliente.key,
-                createdOn: cliente.createdOn,
-                lastModified: cliente.lastModified,
-                ...content,
-            };
-
-        } catch (err) {
-            console.error(err);
-        } finally {
-            if (connection) {
-                try {
-                    await connection.close();
-                }
-                catch (err) {
-                    console.error(err);
-                }
-            }
+          content = JSON.parse(content.toString("utf-8"));
+        } catch (error) {
+          console.error("Error parsing document content:", error);
+          content = {};
         }
-
-        return result;
+      }
+      result = {
+        id: cliente.key,
+        createdOn: cliente.createdOn,
+        lastModified: cliente.lastModified,
+        ...content,
+      };
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (err) {
+          console.error(err);
+        }
+      }
     }
 
+    return result;
+  }
+    
     async save(cliente) {
         let connection, novoCliente, result;
 
